@@ -1,0 +1,11 @@
+export PATH="$TOOLCHAIN/bin:$PATH"
+
+export AR_target=llvm-ar
+export CC_target=clang
+export CXX_target=clang++
+export LINK_target=clang++
+
+export AR_host=$(which ar)
+export CC_host=$(which gcc)
+export CXX_host=$(which g++)
+export LINK_host=$(which g++)

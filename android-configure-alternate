@@ -68,21 +68,19 @@ else
     make_toolchain
 fi
 export PATH=$TOOLCHAIN/bin:$PATH
-# export AR=$TOOLCHAIN/bin/$SUFFIX-ar
-# export CC=$TOOLCHAIN/bin/$SUFFIX-gcc
-# export CXX=$TOOLCHAIN/bin/$SUFFIX-g++
-# export LINK=$TOOLCHAIN/bin/$SUFFIX-g++
-export AR_target=$TOOLCHAIN/bin/llvm-ar
-export CC_target=$TOOLCHAIN/bin/clang
-export CXX_target=$TOOLCHAIN/bin/clang++
-export LINK_target=$TOOLCHAIN/bin/clang++
+export AR=$TOOLCHAIN/bin/$SUFFIX-ar
+export CC=$TOOLCHAIN/bin/$SUFFIX-gcc
+export CXX=$TOOLCHAIN/bin/$SUFFIX-g++
+export LINK=$TOOLCHAIN/bin/$SUFFIX-g++
+# export AR_target=$TOOLCHAIN/bin/llvm-ar
+# export CC_target=$TOOLCHAIN/bin/clang
+# export CXX_target=$TOOLCHAIN/bin/clang++
+# export LINK_target=$TOOLCHAIN/bin/clang++
 
-export AR_host=$(which ar)
-export CC_host=$(which gcc)
-export CXX_host=$(which g++)
-export LINK_host=$(which g++)
-
-export CFLAGS="-std=c++11"
+# export AR_host=$(which ar)
+# export CC_host=$(which gcc)
+# export CXX_host=$(which g++)
+# export LINK_host=$(which g++)
 
 GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
