@@ -29,6 +29,8 @@
 #include "src/tracing/trace-event.h"
 #include "src/tracing/tracing-category-observer.h"
 
+#include <cpp_comp/math.h>
+
 namespace v8 {
 namespace internal {
 
