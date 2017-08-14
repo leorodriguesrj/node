@@ -15,8 +15,6 @@
 #include "src/double.h"
 #include "src/globals.h"
 
-#include <cpp_comp/math.h>
-
 namespace v8 {
 namespace internal {
 namespace compiler {

@@ -9,8 +9,6 @@
 #include <set>
 #include <sstream>
 
-#include <cpp_comp/math.h>
-
 namespace node {
 namespace inspector {
 

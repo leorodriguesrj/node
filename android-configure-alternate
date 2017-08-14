@@ -53,7 +53,9 @@ function make_toolchain {
      $NDK_PATH/build/tools/make_standalone_toolchain.py \
 	--arch $ARCH \
 	--install-dir $TOOLCHAIN \
-	--api 21
+	--api 21 \
+    --stl libc++ \
+    -v
 }
 
 export TOOLCHAIN=$PWD/android-toolchain
@@ -67,15 +69,16 @@ if [ -d "$TOOLCHAIN" ]; then
 else
     make_toolchain
 fi
+
 export PATH=$TOOLCHAIN/bin:$PATH
 # export AR=$TOOLCHAIN/bin/$SUFFIX-ar
 # export CC=$TOOLCHAIN/bin/$SUFFIX-gcc
 # export CXX=$TOOLCHAIN/bin/$SUFFIX-g++
 # export LINK=$TOOLCHAIN/bin/$SUFFIX-g++
 export AR_target=$TOOLCHAIN/bin/llvm-ar
-export CC_target=$TOOLCHAIN/bin/clang
-export CXX_target=$TOOLCHAIN/bin/clang++
-export LINK_target=$TOOLCHAIN/bin/clang++
+export "CC_target=$TOOLCHAIN/bin/clang"
+export "CXX_target=$TOOLCHAIN/bin/clang++"
+export "LINK_target=$TOOLCHAIN/bin/clang++"
 
 export AR_host=$(which ar)
 export CC_host=$(which gcc)
@@ -86,8 +89,13 @@ GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
 GYP_DEFINES+=" android_target_arch=$ARCH"
 GYP_DEFINES+=" host_os=linux OS=android node_shared=true"
-GYP_DEFINES+=" library=shared_library component=shared_library"
+GYP_DEFINES+=" library=shared_library"
+GYP_DEFINES+=" visibility=visible"
 export GYP_DEFINES
+
+GYPFLAGS="-Dcomponent=shared_library"
+GYPFLAGS=" -Dnode_shared=true"
+export GYPFLAGS
 
 if [ -f "configure" ]; then
     ./configure \

@@ -87,7 +87,7 @@
           }],
           ['OS == "android"', {
             'cflags': [ '-fPIE' ],
-            'ldflags': [ '-fPIE', '-pie' ]
+            'ldflags': [ '-fPIE' ]
           }],
           ['node_shared=="true"', {
             'msvs_settings': {
@@ -137,7 +137,7 @@
           }],
           ['OS == "android"', {
             'cflags': [ '-fPIE' ],
-            'ldflags': [ '-fPIE', '-pie' ]
+            'ldflags': [ '-fPIE' ]
           }],
           ['node_shared=="true"', {
             'msvs_settings': {
@@ -281,7 +281,7 @@
       }],
       [ 'OS in "linux freebsd openbsd solaris android aix"', {
         'cflags': [ '-Wall', '-Wextra', '-Wno-unused-parameter', ],
-        'cflags_cc': [ '-fno-rtti', '-fno-exceptions', '-std=c++11' ],
+        'cflags_cc': [ '-fno-rtti', '-fno-exceptions', '-std=gnu++0x' ], # -std=c++11
         'ldflags': [ '-rdynamic' ],
         'target_conditions': [
           # The 1990s toolchain on SmartOS can't handle thin archives.
