@@ -54,8 +54,7 @@ function make_toolchain {
 	--arch $ARCH \
 	--install-dir $TOOLCHAIN \
 	--api 21 \
-    --stl libc++ \
-    -v
+    --stl libc++
 }
 
 export TOOLCHAIN=$PWD/android-toolchain
@@ -71,6 +70,7 @@ else
 fi
 
 export PATH=$TOOLCHAIN/bin:$PATH
+
 # export AR=$TOOLCHAIN/bin/$SUFFIX-ar
 # export CC=$TOOLCHAIN/bin/$SUFFIX-gcc
 # export CXX=$TOOLCHAIN/bin/$SUFFIX-g++
@@ -89,13 +89,10 @@ GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
 GYP_DEFINES+=" android_target_arch=$ARCH"
 GYP_DEFINES+=" host_os=linux OS=android node_shared=true"
-GYP_DEFINES+=" library=shared_library"
+GYP_DEFINES+=" library=shared component=shared_library"
 GYP_DEFINES+=" visibility=visible"
 export GYP_DEFINES
 
-GYPFLAGS="-Dcomponent=shared_library"
-GYPFLAGS=" -Dnode_shared=true"
-export GYPFLAGS
 
 if [ -f "configure" ]; then
     ./configure \
