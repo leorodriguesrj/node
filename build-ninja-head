@@ -1,0 +1,14 @@
+cc = /home/lrteixeira/repositorio/git/node/node-latest/android-toolchain/bin/clang -fPIC
+cxx = /home/lrteixeira/repositorio/git/node/node-latest/android-toolchain/bin/clang++ -fPIC
+ld = $cc -pthread
+ldxx = $cxx -pthread
+ar = /home/lrteixeira/repositorio/git/node/node-latest/android-toolchain/bin/llvm-ar
+nm = nm
+readelf = readelf
+ar_host = /usr/bin/ar
+nm_host = nm
+readelf_host = readelf
+cc_host = /usr/bin/gcc -m32
+cxx_host = /usr/bin/g++ -m32
+ld_host = $cc_host -pthread
+ldxx_host = $cxx_host -pthread

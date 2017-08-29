@@ -54,7 +54,7 @@ function make_toolchain {
 	--arch $ARCH \
 	--install-dir $TOOLCHAIN \
 	--api 21 \
-    --stl libc++
+        --stl libc++
 }
 
 export TOOLCHAIN=$PWD/android-toolchain
@@ -75,22 +75,23 @@ export PATH=$TOOLCHAIN/bin:$PATH
 # export CC=$TOOLCHAIN/bin/$SUFFIX-gcc
 # export CXX=$TOOLCHAIN/bin/$SUFFIX-g++
 # export LINK=$TOOLCHAIN/bin/$SUFFIX-g++
+
+CFLAGS="-m32"
 export AR_target=$TOOLCHAIN/bin/llvm-ar
-export "CC_target=$TOOLCHAIN/bin/clang"
-export "CXX_target=$TOOLCHAIN/bin/clang++"
-export "LINK_target=$TOOLCHAIN/bin/clang++"
+export CC_target=$TOOLCHAIN/bin/clang
+export CXX_target=$TOOLCHAIN/bin/clang++ 
+export LINK_target=$TOOLCHAIN/bin/clang++
 
 export AR_host=$(which ar)
-export CC_host=$(which gcc)
-export CXX_host=$(which g++)
-export LINK_host=$(which g++)
+export CC_host="$(which gcc) $CFLAGS"
+export CXX_host="$(which g++) $CFLAGS"
+export LINK_host="$(which g++) $CFLAGS -pthread"
 
 GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
 GYP_DEFINES+=" android_target_arch=$ARCH"
-GYP_DEFINES+=" host_os=linux OS=android node_shared=true"
+GYP_DEFINES+=" host_os=linux OS=android is_component_build=true"
 GYP_DEFINES+=" library=shared component=shared_library"
-GYP_DEFINES+=" visibility=visible"
 export GYP_DEFINES
 
 
@@ -99,9 +100,10 @@ if [ -f "configure" ]; then
         --cross-compiling \
         --dest-cpu=$DEST_CPU \
         --dest-os=android \
-        --without-snapshot \
         --openssl-no-asm \
         --with-intl=full-icu \
         --download=all \
+        --ninja \
+        --enable-d8 \
         --shared
 fi
