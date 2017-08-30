@@ -83,14 +83,14 @@ export CXX_target=$TOOLCHAIN/bin/clang++
 export LINK_target=$TOOLCHAIN/bin/clang++
 
 export AR_host=$(which ar)
-export CC_host="$(which gcc) $CFLAGS"
-export CXX_host="$(which g++) $CFLAGS"
-export LINK_host="$(which g++) $CFLAGS -pthread"
+export CC_host="$(which gcc)"
+export CXX_host="$(which g++)"
+export LINK_host="$(which g++)"
 
 GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
 GYP_DEFINES+=" android_target_arch=$ARCH"
-GYP_DEFINES+=" host_os=linux OS=android is_component_build=true"
+GYP_DEFINES+=" host_os=linux host_arch=x64 OS=android is_component_build=true"
 GYP_DEFINES+=" library=shared component=shared_library"
 export GYP_DEFINES
 

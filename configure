@@ -1392,6 +1392,40 @@ if 'make_global_settings' in output:
 else:
   make_global_settings = False
 
+output['target_conditions'] = [
+    ['_toolset=="host" and host_arch in "ia32 x64 x86"', {
+        'cflags': ['-m32'],
+        'cflags_cc': ['-m32']
+    }],
+    ['_type=="shared_library"', {
+        'ldflags': ['-pthread']
+    }]
+    # ['target_arch=="x64" or target_arch=="x86"', {
+    #     'cflags': ['-m32'],
+    #     'cflags_cc': ['-m32'],
+    #     'ldflags': ['-pthread']
+    #     # 'target_conditions': [
+    #     #     ['_type=="shared_library"', {
+    #     #         'cflags': ['-fPIC'],
+    #     #         'cxxflags': ['-fPIC'],
+    #     #         'ldflags': ['-pthread']
+    #     #     }]
+    #     # ]
+    # }],
+    # ['target_arch=="arm"', {
+    #     # 'cflags': ['-fPIC'],
+    #     # 'cflags_cc': ['-fPIC'],
+    #     'ldflags': ['-pthread']
+    #     # 'target_conditions': [
+    #     #     ['_type=="shared_library"', {
+    #     #         'cflags': ['-fPIC'],
+    #     #         'cxxflags': ['-fPIC'],
+    #     #         'ldflags': ['-pthread']
+    #     #     }]
+    #     # ]
+    # }]
+]
+
 output = {
   'variables': variables,
   'target_defaults': output,
