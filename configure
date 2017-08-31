@@ -1395,35 +1395,15 @@ else:
 output['target_conditions'] = [
     ['_toolset=="host" and host_arch in "ia32 x64 x86"', {
         'cflags': ['-m32'],
-        'cflags_cc': ['-m32']
+        'cflags_cc': ['-m32'],
+        'ldflags': ['-m32', '-pthread']
     }],
-    ['_type=="shared_library"', {
-        'ldflags': ['-pthread']
+    ['_toolset!="host" and _type=="shared_library"', {
+        'ldflags': ['-pthread', '-fPIC']
+    }],
+    ['_toolset!="host" and _type!="shared_library"', {
+        'ldflags': ['-fPIC']
     }]
-    # ['target_arch=="x64" or target_arch=="x86"', {
-    #     'cflags': ['-m32'],
-    #     'cflags_cc': ['-m32'],
-    #     'ldflags': ['-pthread']
-    #     # 'target_conditions': [
-    #     #     ['_type=="shared_library"', {
-    #     #         'cflags': ['-fPIC'],
-    #     #         'cxxflags': ['-fPIC'],
-    #     #         'ldflags': ['-pthread']
-    #     #     }]
-    #     # ]
-    # }],
-    # ['target_arch=="arm"', {
-    #     # 'cflags': ['-fPIC'],
-    #     # 'cflags_cc': ['-fPIC'],
-    #     'ldflags': ['-pthread']
-    #     # 'target_conditions': [
-    #     #     ['_type=="shared_library"', {
-    #     #         'cflags': ['-fPIC'],
-    #     #         'cxxflags': ['-fPIC'],
-    #     #         'ldflags': ['-pthread']
-    #     #     }]
-    #     # ]
-    # }]
 ]
 
 output = {
