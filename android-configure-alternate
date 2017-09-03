@@ -22,6 +22,11 @@ case $ARCH in
         SUFFIX="$ARCH-linux-androideabi"
         TOOLCHAIN_NAME="$SUFFIX"
         ;;
+    arm64)
+        DEST_CPU="$ARCH"
+        SUFFIX="aarch64-linux-android-4.9"
+        TOOLCHAIN_NAME="$SUFFIX"
+        ;;
     armv7l)
         DEST_CPU="$ARCH"
         SUFFIX="$ARCH-linux-androideabi"
@@ -51,9 +56,9 @@ function make_toolchain {
 #        --install-dir=$TOOLCHAIN \
 #        --platform=android-21
      $NDK_PATH/build/tools/make_standalone_toolchain.py \
-	--arch $ARCH \
-	--install-dir $TOOLCHAIN \
-	--api 21 \
+        --arch $ARCH \
+        --install-dir $TOOLCHAIN \
+        --api 21 \
         --stl libc++
 }
 
@@ -76,22 +81,22 @@ export PATH=$TOOLCHAIN/bin:$PATH
 # export CXX=$TOOLCHAIN/bin/$SUFFIX-g++
 # export LINK=$TOOLCHAIN/bin/$SUFFIX-g++
 
-CFLAGS="-m32"
-export AR_target=$TOOLCHAIN/bin/llvm-ar
-export CC_target=$TOOLCHAIN/bin/clang
-export CXX_target=$TOOLCHAIN/bin/clang++ 
-export LINK_target=$TOOLCHAIN/bin/clang++
+export AR_target="$TOOLCHAIN/bin/llvm-ar"
+export CC_target="$TOOLCHAIN/bin/clang"
+export CXX_target="$TOOLCHAIN/bin/clang++"
+export LINK_target="$TOOLCHAIN/bin/clang++"
 
 export AR_host=$(which ar)
-export CC_host="$(which gcc)"
-export CXX_host="$(which g++)"
-export LINK_host="$(which g++)"
+export CC_host=$(which gcc)
+export CXX_host=$(which g++)
+export LINK_host=$(which g++)
 
 GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
 GYP_DEFINES+=" android_target_arch=$ARCH"
-GYP_DEFINES+=" host_os=linux host_arch=x64 OS=android is_component_build=true"
-GYP_DEFINES+=" library=shared component=shared_library"
+GYP_DEFINES+=" host_os=linux host_arch=x64 OS=android"
+# GYP_DEFINES+=" host_os=linux host_arch=x64 OS=android is_component_build=true"
+# GYP_DEFINES+=" library=shared component=shared_library"
 export GYP_DEFINES
 
 
