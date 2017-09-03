@@ -130,6 +130,9 @@
     'conditions': [
       [ 'node_shared=="true"', {
         'node_target_type%': 'shared_library',
+      }],
+      [ 'node_static=="true"', {
+        'node_target_type%': 'static_library',
       }, {
         'node_target_type%': 'executable',
       }],
