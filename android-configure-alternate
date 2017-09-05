@@ -58,7 +58,7 @@ function make_toolchain {
      $NDK_PATH/build/tools/make_standalone_toolchain.py \
         --arch $ARCH \
         --install-dir $TOOLCHAIN \
-        --api 21 \
+        --api 24 \
         --stl libc++
 }
 
