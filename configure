@@ -1416,8 +1416,6 @@ output['target_conditions'] = [
     }]
 ]
 
-#variables['library'] = 'shared_library'
-
 output = {
   'variables': variables,
   'target_defaults': output,
