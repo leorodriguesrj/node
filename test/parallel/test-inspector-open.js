@@ -13,7 +13,8 @@ const url = require('url');
 if (process.env.BE_CHILD)
   return beChild();
 
-const child = fork(__filename, { env: { BE_CHILD: 1 } });
+const child = fork(__filename,
+                   { env: Object.assign({}, process.env, { BE_CHILD: 1 }) });
 
 child.once('message', common.mustCall((msg) => {
   assert.strictEqual(msg.cmd, 'started');
@@ -68,7 +69,6 @@ function tryToCloseWhenClosed(msg) {
 function reopenAfterClose(msg) {
   assert.strictEqual(msg.cmd, 'url');
   const port = url.parse(msg.url).port;
-  assert.notStrictEqual(port, firstPort);
   ping(port, (err) => {
     assert.ifError(err);
     process.exit();

@@ -33,6 +33,25 @@ napi_value testGetVersion(napi_env env, napi_callback_info info) {
   return result;
 }
 
+napi_value testGetNodeVersion(napi_env env, napi_callback_info info) {
+  const napi_node_version* node_version;
+  napi_value result, major, minor, patch, release;
+  NAPI_CALL(env, napi_get_node_version(env, &node_version));
+  NAPI_CALL(env, napi_create_uint32(env, node_version->major, &major));
+  NAPI_CALL(env, napi_create_uint32(env, node_version->minor, &minor));
+  NAPI_CALL(env, napi_create_uint32(env, node_version->patch, &patch));
+  NAPI_CALL(env, napi_create_string_utf8(env,
+                                         node_version->release,
+                                         (size_t)-1,
+                                         &release));
+  NAPI_CALL(env, napi_create_array_with_length(env, 4, &result));
+  NAPI_CALL(env, napi_set_element(env, result, 0, major));
+  NAPI_CALL(env, napi_set_element(env, result, 1, minor));
+  NAPI_CALL(env, napi_set_element(env, result, 2, patch));
+  NAPI_CALL(env, napi_set_element(env, result, 3, release));
+  return result;
+}
+
 napi_value doInstanceOf(napi_env env, napi_callback_info info) {
   size_t argc = 2;
   napi_value args[2];
@@ -119,16 +138,28 @@ napi_value testNapiTypeof(napi_env env, napi_callback_info info) {
   return result;
 }
 
+static bool deref_item_called = false;
 static void deref_item(napi_env env, void* data, void* hint) {
   (void) hint;
 
+  deref_item_called = true;
   NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, (napi_ref)data));
+}
+
+napi_value deref_item_was_called(napi_env env, napi_callback_info info) {
+  napi_value it_was_called;
+
+  NAPI_CALL(env, napi_get_boolean(env, deref_item_called, &it_was_called));
+
+  return it_was_called;
 }
 
 napi_value wrap(napi_env env, napi_callback_info info) {
   size_t argc = 2;
   napi_value argv[2];
   napi_ref payload;
+
+  deref_item_called = false;
 
   NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
   NAPI_CALL(env, napi_create_reference(env, argv[1], 1, &payload));
@@ -137,11 +168,59 @@ napi_value wrap(napi_env env, napi_callback_info info) {
   return NULL;
 }
 
+napi_value remove_wrap(napi_env env, napi_callback_info info) {
+  size_t argc = 1;
+  napi_value wrapped;
+  void* data;
+
+  NAPI_CALL(env, napi_get_cb_info(env, info, &argc, &wrapped, NULL, NULL));
+  NAPI_CALL(env, napi_remove_wrap(env, wrapped, &data));
+  if (data != NULL) {
+    NAPI_CALL(env, napi_delete_reference(env, (napi_ref)data));
+  }
+
+  return NULL;
+}
+
+static bool finalize_called = false;
+static void test_finalize(napi_env env, void* data, void* hint) {
+  finalize_called = true;
+}
+
+napi_value test_finalize_wrap(napi_env env, napi_callback_info info) {
+  size_t argc = 1;
+  napi_value js_object;
+
+  NAPI_CALL(env, napi_get_cb_info(env, info, &argc, &js_object, NULL, NULL));
+  NAPI_CALL(env, napi_wrap(env, js_object, NULL, test_finalize, NULL, NULL));
+
+  return NULL;
+}
+
+napi_value finalize_was_called(napi_env env, napi_callback_info info) {
+  napi_value it_was_called;
+
+  NAPI_CALL(env, napi_get_boolean(env, finalize_called, &it_was_called));
+
+  return it_was_called;
+}
+
+napi_value testAdjustExternalMemory(napi_env env, napi_callback_info info) {
+  napi_value result;
+  int64_t adjustedValue;
+
+  NAPI_CALL(env, napi_adjust_external_memory(env, 1, &adjustedValue));
+  NAPI_CALL(env, napi_create_double(env, adjustedValue, &result));
+
+  return result;
+}
+
 void Init(napi_env env, napi_value exports, napi_value module, void* priv) {
   napi_property_descriptor descriptors[] = {
     DECLARE_NAPI_PROPERTY("testStrictEquals", testStrictEquals),
     DECLARE_NAPI_PROPERTY("testGetPrototype", testGetPrototype),
     DECLARE_NAPI_PROPERTY("testGetVersion", testGetVersion),
+    DECLARE_NAPI_PROPERTY("testGetNodeVersion", testGetNodeVersion),
     DECLARE_NAPI_PROPERTY("doInstanceOf", doInstanceOf),
     DECLARE_NAPI_PROPERTY("getUndefined", getUndefined),
     DECLARE_NAPI_PROPERTY("getNull", getNull),
@@ -149,6 +228,11 @@ void Init(napi_env env, napi_value exports, napi_value module, void* priv) {
     DECLARE_NAPI_PROPERTY("testNapiErrorCleanup", testNapiErrorCleanup),
     DECLARE_NAPI_PROPERTY("testNapiTypeof", testNapiTypeof),
     DECLARE_NAPI_PROPERTY("wrap", wrap),
+    DECLARE_NAPI_PROPERTY("removeWrap", remove_wrap),
+    DECLARE_NAPI_PROPERTY("testFinalizeWrap", test_finalize_wrap),
+    DECLARE_NAPI_PROPERTY("finalizeWasCalled", finalize_was_called),
+    DECLARE_NAPI_PROPERTY("derefItemWasCalled", deref_item_was_called),
+    DECLARE_NAPI_PROPERTY("testAdjustExternalMemory", testAdjustExternalMemory)
   };
 
   NAPI_CALL_RETURN_VOID(env, napi_define_properties(

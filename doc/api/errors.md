@@ -1,5 +1,6 @@
 # Errors
 
+<!--introduced_in=v4.0.0-->
 <!--type=misc-->
 
 Applications running in Node.js will generally experience four categories of
@@ -357,6 +358,18 @@ loop tick.
 
 System-level errors are generated as augmented `Error` instances, which are
 detailed [here](#errors_system_errors).
+
+## Class: AssertionError
+
+A subclass of `Error` that indicates the failure of an assertion. Such errors
+commonly indicate inequality of actual and expected value.
+
+For example:
+
+```js
+assert.strictEqual(1, 2);
+// AssertionError [ERR_ASSERTION]: 1 === 2
+```
 
 ## Class: RangeError
 
@@ -986,6 +999,11 @@ Used when an attempt is made to open an IPC communication channel with a
 synchronous forked Node.js process. See the documentation for the
 [`child_process`](child_process.html) module for more information.
 
+<a id="ERR_METHOD_NOT_IMPLEMENTED"></a>
+### ERR_METHOD_NOT_IMPLEMENTED
+
+Used when a method is required but not implemented.
+
 <a id="ERR_MISSING_ARGS"></a>
 ### ERR_MISSING_ARGS
 
@@ -1118,11 +1136,21 @@ Used when an attempt is made to launch a Node.js process with an unknown
 by errors in user code, although it is not impossible. Occurrences of this error
 are most likely an indication of a bug within Node.js itself.
 
+<a id="ERR_VALUE_OUT_OF_RANGE"></a>
+### ERR_VALUE_OUT_OF_RANGE
+
+Used when a number value is out of range.
+
 <a id="ERR_V8BREAKITERATOR"></a>
 ### ERR_V8BREAKITERATOR
 
 Used when the V8 BreakIterator API is used but the full ICU data set is not
 installed.
+
+<a id="ERR_VALUE_OUT_OF_RANGE"></a>
+### ERR_VALUE_OUT_OF_RANGE
+
+Used when a given value is out of the accepted range.
 
 [`ERR_INVALID_ARG_TYPE`]: #ERR_INVALID_ARG_TYPE
 [`subprocess.kill()`]: child_process.html#child_process_subprocess_kill_signal

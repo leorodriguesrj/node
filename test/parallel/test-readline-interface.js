@@ -22,6 +22,7 @@
 // Flags: --expose_internals
 'use strict';
 const common = require('../common');
+
 const assert = require('assert');
 const readline = require('readline');
 const internalReadline = require('internal/readline');
@@ -233,43 +234,6 @@ function isWarned(emitter) {
   // sending multiple newlines at once that does not end with a new line
   // and a `end` event(last line is)
 
-  // \r\n should emit one line event, not two
-  {
-    const fi = new FakeInput();
-    const rli = new readline.Interface(
-      { input: fi, output: fi, terminal: terminal }
-    );
-    const expectedLines = ['foo', 'bar', 'baz', 'bat'];
-    let callCount = 0;
-    rli.on('line', function(line) {
-      assert.strictEqual(line, expectedLines[callCount]);
-      callCount++;
-    });
-    fi.emit('data', expectedLines.join('\r\n'));
-    assert.strictEqual(callCount, expectedLines.length - 1);
-    rli.close();
-  }
-
-  // \r\n should emit one line event when split across multiple writes.
-  {
-    const fi = new FakeInput();
-    const rli = new readline.Interface(
-      { input: fi, output: fi, terminal: terminal }
-    );
-    const expectedLines = ['foo', 'bar', 'baz', 'bat'];
-    let callCount = 0;
-    rli.on('line', function(line) {
-      assert.strictEqual(line, expectedLines[callCount]);
-      callCount++;
-    });
-    expectedLines.forEach(function(line) {
-      fi.emit('data', `${line}\r`);
-      fi.emit('data', '\n');
-    });
-    assert.strictEqual(callCount, expectedLines.length);
-    rli.close();
-  }
-
   // \r should behave like \n when alone
   {
     const fi = new FakeInput();
@@ -325,30 +289,6 @@ function isWarned(emitter) {
       assert.strictEqual(callCount, 2);
       rli.close();
     }), delay * 2);
-  }
-
-  // Emit one line events when the delay between \r and \n is
-  // over the default crlfDelay but within the setting value
-  {
-    const fi = new FakeInput();
-    const delay = 125;
-    const crlfDelay = common.platformTimeout(1000);
-    const rli = new readline.Interface({
-      input: fi,
-      output: fi,
-      terminal: terminal,
-      crlfDelay
-    });
-    let callCount = 0;
-    rli.on('line', function(line) {
-      callCount++;
-    });
-    fi.emit('data', '\r');
-    setTimeout(common.mustCall(() => {
-      fi.emit('data', '\n');
-      assert.strictEqual(callCount, 1);
-      rli.close();
-    }), delay);
   }
 
   // set crlfDelay to `Infinity` is allowed

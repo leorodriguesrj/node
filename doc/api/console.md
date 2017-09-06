@@ -1,5 +1,7 @@
 # Console
 
+<!--introduced_in=v0.10.13-->
+
 > Stability: 2 - Stable
 
 The `console` module provides a simple debugging console that is similar to the
@@ -169,7 +171,7 @@ console.log('this will also print');
 
 ### console.clear()
 <!-- YAML
-added: REPLACEME
+added: v8.3.0
 -->
 
 When `stdout` is a TTY, calling `console.clear()` will attempt to clear the
@@ -183,7 +185,7 @@ binary.
 
 ### console.count([label])
 <!-- YAML
-added: REPLACEME
+added: v8.3.0
 -->
 
 * `label` {string} The display label for the counter. Defaults to `'default'`.
@@ -216,7 +218,7 @@ undefined
 
 ### console.countReset([label = 'default'])
 <!-- YAML
-added: REPLACEME
+added: v8.3.0
 -->
 
 * `label` {string} The display label for the counter. Defaults to `'default'`.
@@ -285,6 +287,32 @@ console.error('error', code);
 If formatting elements (e.g. `%d`) are not found in the first string then
 [`util.inspect()`][] is called on each argument and the resulting string
 values are concatenated. See [`util.format()`][] for more information.
+
+### console.group([...label])
+<!-- YAML
+added: REPLACEME
+-->
+
+* `label` {any}
+
+Increases indentation of subsequent lines by two spaces.
+
+If one or more `label`s are provided, those are printed first without the
+additional indentation.
+
+### console.groupCollapsed()
+<!-- YAML
+  added: REPLACEME
+-->
+
+An alias for [`console.group()`][].
+
+### console.groupEnd()
+<!-- YAML
+added: REPLACEME
+-->
+
+Decreases indentation of subsequent lines by two spaces.
 
 ### console.info([data][, ...args])
 <!-- YAML
@@ -390,6 +418,7 @@ added: v0.1.100
 The `console.warn()` function is an alias for [`console.error()`][].
 
 [`console.error()`]: #console_console_error_data_args
+[`console.group()`]: #console_console_group_label
 [`console.log()`]: #console_console_log_data_args
 [`console.time()`]: #console_console_time_label
 [`console.timeEnd()`]: #console_console_timeend_label

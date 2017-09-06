@@ -273,29 +273,13 @@ class Http2Options {
     nghttp2_option_del(options_);
   }
 
-  nghttp2_option* operator*() {
+  nghttp2_option* operator*() const {
     return options_;
   }
 
-  void SetPaddingStrategy(uint32_t val) {
+  void SetPaddingStrategy(padding_strategy_type val) {
     CHECK_LE(val, PADDING_STRATEGY_CALLBACK);
     padding_strategy_ = static_cast<padding_strategy_type>(val);
-  }
-
-  void SetMaxDeflateDynamicTableSize(size_t val) {
-    nghttp2_option_set_max_deflate_dynamic_table_size(options_, val);
-  }
-
-  void SetMaxReservedRemoteStreams(uint32_t val) {
-    nghttp2_option_set_max_reserved_remote_streams(options_, val);
-  }
-
-  void SetMaxSendHeaderBlockLength(size_t val) {
-    nghttp2_option_set_max_send_header_block_length(options_, val);
-  }
-
-  void SetPeerMaxConcurrentStreams(uint32_t val) {
-    nghttp2_option_set_peer_max_concurrent_streams(options_, val);
   }
 
   padding_strategy_type GetPaddingStrategy() {
@@ -387,7 +371,7 @@ class Http2Session : public AsyncWrap,
                 size_t length) override;
   void OnFrameError(int32_t id, uint8_t type, int error_code) override;
   void OnTrailers(Nghttp2Stream* stream,
-                  MaybeStackBuffer<nghttp2_nv>* trailers) override;
+                  const SubmitTrailers& submit_trailers) override;
   void AllocateSend(size_t recommended, uv_buf_t* buf) override;
 
   int DoWrite(WriteWrap* w, uv_buf_t* bufs, size_t count,
@@ -488,24 +472,48 @@ class ExternalHeader :
     return vec_.len;
   }
 
-  static Local<String> New(Isolate* isolate, nghttp2_rcbuf* buf) {
-    EscapableHandleScope scope(isolate);
+  static inline
+  MaybeLocal<String> GetInternalizedString(Environment* env,
+                                           const nghttp2_vec& vec) {
+    return String::NewFromOneByte(env->isolate(),
+                                  vec.base,
+                                  v8::NewStringType::kInternalized,
+                                  vec.len);
+  }
+
+  template<bool may_internalize>
+  static MaybeLocal<String> New(Environment* env, nghttp2_rcbuf* buf) {
+    if (nghttp2_rcbuf_is_static(buf)) {
+      auto& static_str_map = env->isolate_data()->http2_static_strs;
+      v8::Eternal<v8::String>& eternal = static_str_map[buf];
+      if (eternal.IsEmpty()) {
+        Local<String> str =
+            GetInternalizedString(env, nghttp2_rcbuf_get_buf(buf))
+                .ToLocalChecked();
+        eternal.Set(env->isolate(), str);
+        return str;
+      }
+      return eternal.Get(env->isolate());
+    }
+
     nghttp2_vec vec = nghttp2_rcbuf_get_buf(buf);
     if (vec.len == 0) {
       nghttp2_rcbuf_decref(buf);
-      return scope.Escape(String::Empty(isolate));
+      return String::Empty(env->isolate());
+    }
+
+    if (may_internalize && vec.len < 64) {
+      // This is a short header name, so there is a good chance V8 already has
+      // it internalized.
+      return GetInternalizedString(env, vec);
     }
 
     ExternalHeader* h_str = new ExternalHeader(buf);
-    MaybeLocal<String> str = String::NewExternalOneByte(isolate, h_str);
-    isolate->AdjustAmountOfExternalAllocatedMemory(vec.len);
-
-    if (str.IsEmpty()) {
+    MaybeLocal<String> str = String::NewExternalOneByte(env->isolate(), h_str);
+    if (str.IsEmpty())
       delete h_str;
-      return scope.Escape(String::Empty(isolate));
-    }
 
-    return scope.Escape(str.ToLocalChecked());
+    return str;
   }
 
  private:
@@ -515,54 +523,20 @@ class ExternalHeader :
 
 class Headers {
  public:
-  Headers(Isolate* isolate, Local<Context> context, Local<Array> headers) {
-    headers_.AllocateSufficientStorage(headers->Length());
-    Local<Value> item;
-    Local<Array> header;
-
-    for (size_t n = 0; n < headers->Length(); n++) {
-      item = headers->Get(context, n).ToLocalChecked();
-      CHECK(item->IsArray());
-      header = item.As<Array>();
-      Local<Value> key = header->Get(context, 0).ToLocalChecked();
-      Local<Value> value = header->Get(context, 1).ToLocalChecked();
-      CHECK(key->IsString());
-      CHECK(value->IsString());
-      size_t keylen = StringBytes::StorageSize(isolate, key, ASCII);
-      size_t valuelen = StringBytes::StorageSize(isolate, value, ASCII);
-      headers_[n].flags = NGHTTP2_NV_FLAG_NONE;
-      Local<Value> flag = header->Get(context, 2).ToLocalChecked();
-      if (flag->BooleanValue(context).ToChecked())
-        headers_[n].flags |= NGHTTP2_NV_FLAG_NO_INDEX;
-      uint8_t* buf = Malloc<uint8_t>(keylen + valuelen);
-      headers_[n].name = buf;
-      headers_[n].value = buf + keylen;
-      headers_[n].namelen =
-          StringBytes::Write(isolate,
-                            reinterpret_cast<char*>(headers_[n].name),
-                            keylen, key, ASCII);
-      headers_[n].valuelen =
-          StringBytes::Write(isolate,
-                            reinterpret_cast<char*>(headers_[n].value),
-                            valuelen, value, ASCII);
-    }
-  }
-
-  ~Headers() {
-    for (size_t n = 0; n < headers_.length(); n++)
-      free(headers_[n].name);
-  }
+  Headers(Isolate* isolate, Local<Context> context, Local<Array> headers);
+  ~Headers() {}
 
   nghttp2_nv* operator*() {
-    return *headers_;
+    return reinterpret_cast<nghttp2_nv*>(*buf_);
   }
 
   size_t length() const {
-    return headers_.length();
+    return count_;
   }
 
  private:
-  MaybeStackBuffer<nghttp2_nv> headers_;
+  size_t count_;
+  MaybeStackBuffer<char, 3000> buf_;
 };
 
 }  // namespace http2

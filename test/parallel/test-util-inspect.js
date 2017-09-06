@@ -307,8 +307,24 @@ assert.strictEqual(
       get: function() { this.push(true); return this.length; }
     }
   );
+  Object.defineProperty(
+    value,
+    '-1',
+    {
+      enumerable: true,
+      value: -1
+    }
+  );
   assert.strictEqual(util.inspect(value),
-                     '[ 1, 2, 3, growingLength: [Getter] ]');
+                     '[ 1, 2, 3, growingLength: [Getter], \'-1\': -1 ]');
+}
+
+// Array with inherited number properties
+{
+  class CustomArray extends Array {}
+  CustomArray.prototype[5] = 'foo';
+  const arr = new CustomArray(50);
+  assert.strictEqual(util.inspect(arr), 'CustomArray [ <50 empty items> ]');
 }
 
 // Function with properties
@@ -783,6 +799,13 @@ if (typeof Symbol !== 'undefined') {
   );
 }
 
+// Test circular Set
+{
+  const set = new Set();
+  set.add(set);
+  assert.strictEqual(util.inspect(set), 'Set { [Circular] }');
+}
+
 // test Map
 {
   assert.strictEqual(util.inspect(new Map()), 'Map {}');
@@ -792,6 +815,18 @@ if (typeof Symbol !== 'undefined') {
   map.bar = 42;
   assert.strictEqual(util.inspect(map, true),
                      'Map { \'foo\' => null, [size]: 1, bar: 42 }');
+}
+
+// Test circular Map
+{
+  const map = new Map();
+  map.set(map, 'map');
+  assert.strictEqual(util.inspect(map), "Map { [Circular] => 'map' }");
+  map.set(map, map);
+  assert.strictEqual(util.inspect(map), 'Map { [Circular] => [Circular] }');
+  map.delete(map);
+  map.set('map', map);
+  assert.strictEqual(util.inspect(map), "Map { 'map' => [Circular] }");
 }
 
 // test Promise
@@ -944,6 +979,10 @@ if (typeof Symbol !== 'undefined') {
 {
   const x = new Array(101).fill();
   assert(!util.inspect(x, { maxArrayLength: 101 }).endsWith('1 more item ]'));
+  assert.strictEqual(
+    util.inspect(x, { maxArrayLength: -1 }),
+    '[ ... 101 more items ]'
+  );
 }
 
 {

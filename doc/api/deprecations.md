@@ -152,7 +152,7 @@ Type: Runtime
 explicitly via error event handlers set on the domain instead.
 
 <a id="DEP0013"></a>
-### DEP0013: fs async function without callback
+### DEP0013: fs asynchronous function without callback
 
 Type: Runtime
 
@@ -201,7 +201,7 @@ code.
 <a id="DEP0019"></a>
 ### DEP0019: require('.') resolved outside directory
 
-Type: Runtime
+Type: End-of-Life
 
 In certain cases, `require('.')` may resolve outside the package directory.
 This behavior is deprecated and will be removed in a future major Node.js

@@ -1,5 +1,7 @@
 # Buffer
 
+<!--introduced_in=v0.10.0-->
+
 > Stability: 2 - Stable
 
 Prior to the introduction of [`TypedArray`] in ECMAScript 2015 (ES6), the
@@ -907,7 +909,7 @@ const buf2 = Buffer.from('7468697320697320612074c3a97374', 'hex');
 console.log(buf2.toString());
 ```
 
-A `TypeError` will be thrown if `str` is not a string.
+A `TypeError` will be thrown if `string` is not a string.
 
 ### Class Method: Buffer.from(object[, offsetOrEncoding[, length]])
 <!-- YAML
@@ -1906,6 +1908,9 @@ changes:
 
 Returns a new `Buffer` that references the same memory as the original, but
 offset and cropped by the `start` and `end` indices.
+
+Specifying `end` greater than [`buf.length`] will return the same result as
+that of `end` equal to [`buf.length`].
 
 *Note*: Modifying the new `Buffer` slice will modify the memory in the
 original `Buffer` because the allocated memory of the two objects overlap.
