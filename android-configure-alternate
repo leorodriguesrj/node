@@ -85,16 +85,21 @@ export AR_target="$TOOLCHAIN/bin/llvm-ar"
 export CC_target="$TOOLCHAIN/bin/clang"
 export CXX_target="$TOOLCHAIN/bin/clang++"
 export LINK_target="$TOOLCHAIN/bin/clang++"
+export READELF_target="$TOOLCHAIN/bin/$SUFFIX-readelf"
+export NM_target="$TOOLCHAIN/bin/$SUFFIX-nm"
 
 export AR_host=$(which ar)
 export CC_host=$(which gcc)
 export CXX_host=$(which g++)
 export LINK_host=$(which g++)
+export READELF_host=$(which readelf)
+export NM_host=$(which nm)
 
 GYP_DEFINES="target_arch=$ARCH"
 GYP_DEFINES+=" v8_target_arch=$ARCH"
 GYP_DEFINES+=" android_target_arch=$ARCH"
-GYP_DEFINES+=" host_os=linux host_arch=x64 OS=android"
+GYP_DEFINES+=" host_os=linux host_arch=x86 OS=android"
+
 # GYP_DEFINES+=" host_os=linux host_arch=x64 OS=android is_component_build=true"
 # GYP_DEFINES+=" library=shared component=shared_library"
 export GYP_DEFINES

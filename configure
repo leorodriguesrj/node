@@ -1273,7 +1273,7 @@ def configure_intl(o):
   # ICU source dir relative to tools/icu (for .gyp file)
   o['variables']['icu_path'] = icu_full_path
   if not os.path.isdir(icu_full_path):
-    print('* ECMA-402 (Intl) support didn\'t find ICU in %s..' % icu_full_path)
+    print('* ECMA-402 (Intl) support didnt find ICU in %s..' % icu_full_path)
     # can we download (or find) a zipfile?
     localzip = icu_download(icu_full_path)
     if localzip:
@@ -1411,19 +1411,24 @@ else:
 
 output['target_conditions'] = [
     ['_toolset=="host" and host_arch in "ia32 x64 x86"', {
-        'cflags_c': ['-m64'],
-        'cflags_cc': ['-m64'],
-        'ldflags': ['-m64', '-pthread']
+        'cflags_c': ['-m32'],
+        'cflags_cc': ['-m32'],
+        'ldflags': ['-m32', '-pthread']
     }],
     ['_toolset!="host" and _type=="shared_library"', {
         'cflags_c': ['-fPIC', '-mcmodel=large'],
-        'cflags_cC': ['-fPIC', '-mcmodel=large'],
+        'cflags_cc': ['-fPIC', '-mcmodel=large'],
         'ldflags': ['-pthread', '-fPIC', '-mcmodel=large', '-dynamic-linker']
     }],
     ['_toolset!="host" and _type!="shared_library"', {
         'cflags_c': ['-fPIC'],
-        'cflags_cC': ['-fPIC'],
+        'cflags_cc': ['-fPIC'],
         'ldflags': ['-fPIC']
+    }],
+    ['_toolset=="target"', {
+      'defines': [
+        '__ANDROID_API__=26'
+      ]
     }]
 ]
 
