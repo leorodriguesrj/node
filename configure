@@ -1427,8 +1427,10 @@ output['target_conditions'] = [
     }],
     ['_toolset=="target"', {
       'defines': [
-        '__ANDROID_API__=26'
-      ]
+        '__ANDROID_API__=24'
+      ],
+      'cflags': ['-march=armv7-a', '-mfpu=neon'],
+      'ldflags': ['-march=armv7-a', '--fix-cortex-a8', '-Wl']
     }]
 ]
 
