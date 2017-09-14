@@ -1418,7 +1418,7 @@ output['target_conditions'] = [
     ['_toolset!="host" and _type=="shared_library"', {
         'cflags_c': ['-fPIC', '-mcmodel=large'],
         'cflags_cc': ['-fPIC', '-mcmodel=large'],
-        'ldflags': ['-pthread', '-fPIC', '-mcmodel=large', '-dynamic-linker']
+        'ldflags': ['-pthread', '-fPIC', '-mcmodel=large']
     }],
     ['_toolset!="host" and _type!="shared_library"', {
         'cflags_c': ['-fPIC'],
@@ -1430,7 +1430,7 @@ output['target_conditions'] = [
         '__ANDROID_API__=24'
       ],
       'cflags': ['-march=armv7-a', '-mfpu=neon'],
-      'ldflags': ['-march=armv7-a', '--fix-cortex-a8', '-Wl']
+      'ldflags': ['-march=armv7-a', '-Wl']
     }]
 ]
 
